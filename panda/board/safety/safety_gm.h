@@ -1,10 +1,10 @@
 // board enforces
 //   in-state
-//      accel set/resume
+//      main sw
 //   out-state
-//      cancel button
-//      regen paddle
-//      accel rising edge
+//
+//
+//
 //      brake rising edge
 //      brake > 0mph
 
@@ -60,13 +60,13 @@ static int gm_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     if (addr == 481) {
       int button = (GET_BYTE(to_push, 5) & 0x70) >> 4;
       switch (button) {
-        case 2:  // resume
-        case 3:  // set
+        //case 2:  // resume
+        case 5:  // main
           controls_allowed = 1;
           break;
-        case 6:  // cancel
-          controls_allowed = 0;
-          break;
+        //case 6:  // cancel
+        //  controls_allowed = 0;
+        //  break;
         default:
           break;  // any other button is irrelevant
       }
@@ -88,7 +88,7 @@ static int gm_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     if (addr == 417) {
       bool gas_pressed = GET_BYTE(to_push, 6) != 0;
       if (!unsafe_allow_gas && gas_pressed && !gas_pressed_prev) {
-        controls_allowed = 0;
+        controls_allowed = 1;
       }
       gas_pressed_prev = gas_pressed;
     }
@@ -97,7 +97,7 @@ static int gm_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     if (addr == 189) {
       bool regen = GET_BYTE(to_push, 0) & 0x20;
       if (regen) {
-        controls_allowed = 0;
+        controls_allowed = 1;
       }
     }
 
@@ -135,10 +135,10 @@ static int gm_tx_hook(CAN_FIFOMailBox_TypeDef *to_send) {
   // disallow actuator commands if gas or brake (with vehicle moving) are pressed
   // and the the latching controls_allowed flag is True
   int pedal_pressed = brake_pressed_prev && vehicle_moving;
-  bool unsafe_allow_gas = unsafe_mode & UNSAFE_DISABLE_DISENGAGE_ON_GAS;
-  if (!unsafe_allow_gas) {
-    pedal_pressed = pedal_pressed || gas_pressed_prev;
-  }
+  //bool unsafe_allow_gas = unsafe_mode & UNSAFE_DISABLE_DISENGAGE_ON_GAS;
+  //if (!unsafe_allow_gas) {
+  //  pedal_pressed = pedal_pressed || gas_pressed_prev;
+  //}
   bool current_controls_allowed = controls_allowed && !pedal_pressed;
 
   // BRAKE: safety check
