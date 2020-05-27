@@ -111,7 +111,8 @@ static int gm_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     if (addr == 481) {
       int button = (GET_BYTE(to_push, 5) & 0x70) >> 4;
       switch (button) {
-        //case 2:  // resume
+        case 2:  // resume
+        case 3:  // accel
         case 5:  // main
           controls_allowed = 1;
           break;
@@ -312,7 +313,7 @@ static int gm_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
 
 
 static CAN_FIFOMailBox_TypeDef * gm_pump_hook(void) {
-  volatile int pedal_pressed = (volatile int)gm_brake_prev && (volatile int)gm_moving;
+  volatile int pedal_pressed = (volatile int)brake_pressed_prev && (volatile int)vehicle_moving;
   volatile bool current_controls_allowed = (volatile bool)controls_allowed && !(volatile int)pedal_pressed;
 
   if (!gm_ffc_detected) {
