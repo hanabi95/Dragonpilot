@@ -4,10 +4,12 @@
 #include "safety/safety_defaults.h"
 #include "safety/safety_honda.h"
 #include "safety/safety_toyota.h"
+#include "safety/safety_toyota_ipas.h"
 #include "safety/safety_tesla.h"
 #include "safety/safety_gm_ascm.h"
 #include "safety/safety_gm.h"
 #include "safety/safety_ford.h"
+#include "safety/safety_cadillac.h"
 #include "safety/safety_hyundai.h"
 #include "safety/safety_chrysler.h"
 #include "safety/safety_subaru.h"
@@ -24,6 +26,7 @@
 #define SAFETY_GM 4U
 #define SAFETY_HONDA_BOSCH_GIRAFFE 5U
 #define SAFETY_FORD 6U
+#define SAFETY_CADILLAC 7U
 #define SAFETY_HYUNDAI 8U
 #define SAFETY_CHRYSLER 9U
 #define SAFETY_TESLA 10U
@@ -31,11 +34,11 @@
 #define SAFETY_MAZDA 13U
 #define SAFETY_NISSAN 14U
 #define SAFETY_VOLKSWAGEN_MQB 15U
+#define SAFETY_TOYOTA_IPAS 16U
 #define SAFETY_ALLOUTPUT 17U
 #define SAFETY_GM_ASCM 18U
 #define SAFETY_NOOUTPUT 19U
 #define SAFETY_HONDA_BOSCH_HARNESS 20U
-#define SAFETY_VOLKSWAGEN_PQ 21U
 #define SAFETY_SUBARU_LEGACY 22U
 
 uint16_t current_safety_mode = SAFETY_SILENT;
@@ -78,6 +81,7 @@ void disable_message_pump() {
   message_pump_hook = NULL;
   message_pump_active = false;
 }
+
 
 // Given a CRC-8 poly, generate a static lookup table to use with a fast CRC-8
 // algorithm. Called at init time for safety modes using CRC-8.
@@ -204,15 +208,6 @@ bool addr_safety_check(CAN_FIFOMailBox_TypeDef *to_push,
   return is_msg_valid(rx_checks, index);
 }
 
-void relay_malfunction_set(void) {
-  relay_malfunction = true;
-  fault_occurred(FAULT_RELAY_MALFUNCTION);
-}
-
-void relay_malfunction_reset(void) {
-  relay_malfunction = false;
-  fault_recovered(FAULT_RELAY_MALFUNCTION);
-}
 
 typedef struct {
   uint16_t id;
@@ -233,9 +228,10 @@ const safety_hook_config safety_hook_registry[] = {
   {SAFETY_SUBARU_LEGACY, &subaru_legacy_hooks},
   {SAFETY_MAZDA, &mazda_hooks},
   {SAFETY_VOLKSWAGEN_MQB, &volkswagen_mqb_hooks},
-  {SAFETY_VOLKSWAGEN_PQ, &volkswagen_pq_hooks},
   {SAFETY_NOOUTPUT, &nooutput_hooks},
 #ifdef ALLOW_DEBUG
+  {SAFETY_CADILLAC, &cadillac_hooks},
+  {SAFETY_TOYOTA_IPAS, &toyota_ipas_hooks},
   {SAFETY_TESLA, &tesla_hooks},
   {SAFETY_NISSAN, &nissan_hooks},
   {SAFETY_ALLOUTPUT, &alloutput_hooks},
@@ -263,7 +259,7 @@ int set_safety_hooks(uint16_t mode, int16_t param) {
   if (mode == SAFETY_NOOUTPUT) {
     //puts("Disabling message pump due to SAFETY_NOOUTPUT");
     disable_message_pump();
-  }  
+  }
   return set_status;
 }
 
