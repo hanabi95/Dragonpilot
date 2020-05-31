@@ -1,3 +1,22 @@
+dragonpilot 0.7.5.3
+========================
+* Dynamic Follow 更新至 ShaneSmiskol:stock_additions 0.7.5 版。(感謝 @ShaneSmiskol 提供代碼、 @Wei 測試)
+* Updated Dynamic Follow to ShaneSmiskol:stock_additions 0.7.5. (Special Thanks to @ShaneSmiskol for the feature and @Wei for testing)
+* 優化 Lexus GSH 轉向。(感謝 @簡銘佑 測試)
+* Optimize Lexus GSH steering. (Thanks to @簡銘佑)
+* C2 支援自動關機「DragonAutoShutdownAt」參數。(感謝 @cgw1968 建議)
+* C2 to support auto shutdown "DragonAutoShutDownAt" param. (Thanks to @cgw1968)
+* 修正出現「pedalPressed」的錯誤。(感謝 @Wei 回報)
+* Fixed issue showing "pedalPressed" error. (Thanks to @Wei) 
+* 將剎車狀熊顯示於 dp 資訊欄。
+* Added brake indicator to dp infobar.
+* 修正「溫度監控」燈示。
+* Fixed "Temp monitor" indicator.
+* 加入「方向燈取消控制」延遲控制設。(感謝 @wabes 建議)
+* Added delay config to "Disable Lat Control on Blinker". (Thanks to @wabes)
+* 加入巴西版 2020 Corolla Hybrid 指紋v2。(感謝 @berno22 提供)
+* Added Brazil 2020 Corolla Hybrid FPv2. (Thanks to @berno22) 
+
 dragonpilot 0.7.5.2
 ========================
 * 加入對 VW MQB/PQ 的支援。(感謝 @dingliangxue 移植)

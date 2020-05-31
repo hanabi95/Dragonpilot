@@ -544,6 +544,8 @@ FW_VERSIONS = {
       b'\x02896630ZR2000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
       b'\x028966312Q4000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
       b'\x038966312N1000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00897CF1203001\x00\x00\x00\x00',
+      b'\x02896630ZN8000\x00\x00\x00\x008966A4703000\x00\x00\x00\x00',
+
     ],
     (Ecu.eps, 0x7a1, None): [
       b'8965B12361\x00\x00\x00\x00\x00\x00',
@@ -553,6 +555,8 @@ FW_VERSIONS = {
       b'\x018965B12470\x00\x00\x00\x00\x00\x00',
       b'\x018965B12500\x00\x00\x00\x00\x00\x00',
       b'\x018965B12530\x00\x00\x00\x00\x00\x00',
+      b'\x018965B12490\x00\x00\x00\x00\x00\x00',
+
     ],
     (Ecu.esp, 0x7b0, None): [
       b'F152612590\x00\x00\x00\x00\x00\x00',
@@ -563,6 +567,7 @@ FW_VERSIONS = {
       b'F152612840\x00\x00\x00\x00\x00\x00',
       b'F152612A10\x00\x00\x00\x00\x00\x00',
       b'F152642540\x00\x00\x00\x00\x00\x00',
+      b'F152612820\x00\x00\x00\x00\x00\x00',
     ],
     (Ecu.fwdRadar, 0x750, 0xf): [
       b'\x018821F3301100\x00\x00\x00\x00',
@@ -951,8 +956,8 @@ DBC = {
   CAR.LEXUS_CTH: dbc_dict('lexus_ct200h_2018_pt_generated', 'toyota_adas'),
   CAR.RAV4H_TSS2: dbc_dict('toyota_nodsu_hybrid_pt_generated', 'toyota_tss2_adas'),
   CAR.LEXUS_NXH: dbc_dict('lexus_nx300h_2018_pt_generated', 'toyota_adas'),
-  CAR.LEXUS_ISH: dbc_dict('lexus_is_2018_pt_generated', 'toyota_adas'),
-  CAR.LEXUS_GSH: dbc_dict('lexus_is_2018_pt_generated', 'toyota_adas'),
+  CAR.LEXUS_ISH: dbc_dict('lexus_is300h_2017_pt_generated', 'toyota_adas'),
+  CAR.LEXUS_GSH: dbc_dict('lexus_is300h_2017_pt_generated', 'toyota_adas'),
   CAR.LEXUS_NXT: dbc_dict('lexus_nxt_2015_pt_generated', 'toyota_adas'),
 }
 

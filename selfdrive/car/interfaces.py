@@ -103,13 +103,8 @@ class CarInterfaceBase():
       if self.dp_last_modified != modified:
         self.dragon_lat_ctrl = False if params.get("DragonLatCtrl", encoding='utf8') == "0" else True
         if self.dragon_lat_ctrl:
-          self.dragon_enable_steering_on_signal = True if params.get("DragonEnableSteeringOnSignal", encoding='utf8') == "1" else False
-        else:
-          self.dragon_enable_steering_on_signal = True
-        if car_name == 'toyota':
-          self.dragon_toyota_stock_dsu = True if params.get("DragonToyotaStockDSU", encoding='utf8') == "1" else False
-        else:
-          self.dragon_toyota_stock_dsu = False
+          self.dragon_enable_steering_on_signal = True if (params.get("DragonEnableSteeringOnSignal", encoding='utf8') == "1" and params.get("LaneChangeEnabled", encoding='utf8') == "0") else False
+        self.dragon_toyota_stock_dsu = True if (car_name == 'toyota' and params.get("DragonToyotaStockDSU", encoding='utf8') == "1") else False
         if not self.dragon_toyota_stock_dsu:
           self.dragon_allow_gas = True if params.get("DragonAllowGas", encoding='utf8') == "1" else False
         self.dp_gear_check = False if params.get("DragonEnableGearCheck", encoding='utf8') == "0" else True
@@ -153,7 +148,7 @@ class CarInterfaceBase():
             (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
           events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
       else:
-        if cs_out.brakePressed and (not self.CS.out.gasPressed or not cs_out.standstill):
+        if cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill):
           events.append(create_event('pedalPressed', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
     return events

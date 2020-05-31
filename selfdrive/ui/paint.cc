@@ -651,7 +651,8 @@ static void ui_draw_df_button(UIState *s) {
   int val = s->dragon_df_mode;
 
   nvgText(s->vg, df_btn_x + df_btn_w / 2, df_btn_y + df_btn_h / 2,
-  val == 1? (strcmp(s->dragon_locale, "zh-TW") == 0? "長距" : strcmp(s->dragon_locale, "zh-CN") == 0? "长距" : "LONG") :
+  val == 4? (strcmp(s->dragon_locale, "zh-TW") == 0? "自動" : strcmp(s->dragon_locale, "zh-CN") == 0? "自动" : "AUTO") :
+  val == 3? (strcmp(s->dragon_locale, "zh-TW") == 0? "長距" : strcmp(s->dragon_locale, "zh-CN") == 0? "长距" : "LONG") :
   val == 2? (strcmp(s->dragon_locale, "zh-TW") == 0? "正常" : strcmp(s->dragon_locale, "zh-CN") == 0? "正常" : "NORMAL") :
   (strcmp(s->dragon_locale, "zh-TW") == 0? "短距" : strcmp(s->dragon_locale, "zh-CN") == 0? "短距" : "SHORT"),
   NULL);
@@ -840,7 +841,7 @@ static void ui_draw_infobar(UIState *s) {
 
   nvgBeginPath(s->vg);
   nvgRect(s->vg, rect_x, rect_y, rect_w, rect_h);
-  nvgFillColor(s->vg, COLOR_BLACK_ALPHA(s->dragon_waze_mode? 150 : 100));
+  nvgFillColor(s->vg, (s->scene.brakeLights? COLOR_RED_ALPHA(s->dragon_waze_mode? 150 : 100) : COLOR_BLACK_ALPHA(s->dragon_waze_mode? 150 : 100)));
   nvgFill(s->vg);
 
   nvgFontSize(s->vg, hasSidebar? 35:42);
