@@ -15,12 +15,14 @@ class CarState(CarStateBase):
     can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
     self.shifter_values = can_define.dv["ECMPRDNL"]["PRNDL"]
 
+    self.lka_button = 0
+
   def update(self, pt_cp):
     ret = car.CarState.new_message()
 
     self.prev_cruise_buttons = self.cruise_buttons
     self.cruise_buttons = pt_cp.vl["ASCMSteeringButton"]['ACCButtons']
-
+    self.lka_button = pt_cp.vl["ASCMSteeringButton"]["LKAButton"]
     ret.wheelSpeeds.fl = pt_cp.vl["EBCMWheelSpdFront"]['FLWheelSpd'] * CV.KPH_TO_MS
     ret.wheelSpeeds.fr = pt_cp.vl["EBCMWheelSpdFront"]['FRWheelSpd'] * CV.KPH_TO_MS
     ret.wheelSpeeds.rl = pt_cp.vl["EBCMWheelSpdRear"]['RLWheelSpd'] * CV.KPH_TO_MS
@@ -58,9 +60,9 @@ class CarState(CarStateBase):
     ret.espDisabled = pt_cp.vl["ESPStatus"]['TractionControlOn'] != 1
     self.pcm_acc_status = pt_cp.vl["ASCMActiveCruiseControlStatus"]['ACCCmdActive']
 
-    regen_pressed = False
+    self.regen_pressed = False
     if self.car_fingerprint == CAR.VOLT or self.car_fingerprint == CAR.BOLT:
-      regen_pressed = bool(pt_cp.vl["EBCMRegenPaddle"]['RegenPaddle'])
+      self.regen_pressed = bool(pt_cp.vl["EBCMRegenPaddle"]['RegenPaddle'])
 
     # Regen braking is braking
     ret.brakePressed = ret.brake > 1e-5
@@ -101,6 +103,7 @@ class CarState(CarStateBase):
       ("TractionControlOn", "ESPStatus", 0),
       ("EPBClosed", "EPBStatus", 0),
       ("CruiseMainOn", "ECMEngineStatus", 0),
+      ("LKAButton", "ASCMSteeringButton", 0),
     ]
 
     if CP.carFingerprint == CAR.VOLT or CP.carFingerprint == CAR.BOLT:

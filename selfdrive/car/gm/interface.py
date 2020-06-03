@@ -61,7 +61,8 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.,41.0], [0.,41.0]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.1,0.24], [0.011,0.02]]
       ret.lateralTuning.pid.kf = 0.000024
-      tire_stiffness_factor = 0.5
+      tire_stiffness_factor = 1.0
+      ret.steerRateCost = 0.5
 
     elif candidate == CAR.MALIBU:
       # supports stop and go, but initial engage must be above 18mph (which include conservatism)
@@ -133,16 +134,44 @@ class CarInterface(CarInterfaceBase):
     self.cp.update_strings(can_strings)
 
     ret = self.CS.update(self.cp)
-    ret.cruiseState.available = self.CS.main_on
-    ret.cruiseState.enabled = self.CS.main_on
 
     ret.canValid = self.cp.can_valid
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
+
+    ret.cruiseState.available = self.CS.main_on
+    ret.cruiseState.enabled = self.CS.main_on and self.CS.lka_button != 0
+
+    buttonEvents = []
+
+    if self.CS.cruise_buttons != self.CS.prev_cruise_buttons and self.CS.prev_cruise_buttons != CruiseButtons.INIT:
+      be = car.CarState.ButtonEvent.new_message()
+      be.type = ButtonType.unknown
+      if self.CS.cruise_buttons != CruiseButtons.UNPRESS:
+        be.pressed = True
+        but = self.CS.cruise_buttons
+      else:
+        be.pressed = False
+        but = self.CS.prev_cruise_buttons
+      if but == CruiseButtons.RES_ACCEL:
+        if not (ret.cruiseState.enabled and ret.standstill):
+          be.type = ButtonType.accelCruise # Suppress resume button if we're resuming from stop so we don't adjust speed.
+      elif but == CruiseButtons.DECEL_SET:
+        be.type = ButtonType.decelCruise
+      elif but == CruiseButtons.CANCEL:
+        be.type = ButtonType.cancel
+      elif but == CruiseButtons.MAIN:
+        be.type = ButtonType.altButton3
+      buttonEvents.append(be)
+
+    ret.buttonEvents = buttonEvents
 
     events = self.create_common_events(ret)
 
     if not ret.cruiseState.available:
       events.append(create_event('wrongCarMode', [ET.NO_ENTRY, ET.USER_DISABLE]))
+
+    if self.CS.regen_pressed:
+      events.append(create_event('manualSteeringRequired', [ET.WARNING]))
 
     if ret.cruiseState.enabled and not self.cruise_enable_prev:
       events.append(create_event('pcmEnable', [ET.ENABLE]))
@@ -151,8 +180,16 @@ class CarInterface(CarInterfaceBase):
 
     if ret.vEgo < self.CP.minEnableSpeed:
       events.append(create_event('speedTooLow', [ET.NO_ENTRY]))
+
     if self.CS.park_brake:
       events.append(create_event('parkBrake', [ET.NO_ENTRY, ET.USER_DISABLE]))
+
+    # handle button presses
+    for b in ret.buttonEvents:
+      if not ret.cruiseState.enabled:
+        if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
+          events.append(create_event('buttonEnable', [ET.ENABLE]))
+
 
     ret.events = events
 
