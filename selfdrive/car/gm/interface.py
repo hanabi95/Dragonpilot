@@ -139,7 +139,7 @@ class CarInterface(CarInterfaceBase):
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
     ret.cruiseState.available = self.CS.main_on
-    ret.cruiseState.enabled = self.CS.main_on and self.CS.lka_button != 0
+    ret.cruiseState.enabled = self.CS.main_on if not self.CS.stock_lka_enable else False
 
     buttonEvents = []
 
