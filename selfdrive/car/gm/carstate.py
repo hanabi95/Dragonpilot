@@ -15,16 +15,11 @@ class CarState(CarStateBase):
     can_define = CANDefine(DBC[CP.carFingerprint]['pt'])
     self.shifter_values = can_define.dv["ECMPRDNL"]["PRNDL"]
 
-    self.lka_button = 0
-    self.stock_lka_enable = False
-
   def update(self, pt_cp):
     ret = car.CarState.new_message()
 
     self.prev_cruise_buttons = self.cruise_buttons
-    self.prev_lka_button = self.lka_button
     self.cruise_buttons = pt_cp.vl["ASCMSteeringButton"]['ACCButtons']
-    self.lka_button = pt_cp.vl["ASCMSteeringButton"]["LKAButton"]
     ret.wheelSpeeds.fl = pt_cp.vl["EBCMWheelSpdFront"]['FLWheelSpd'] * CV.KPH_TO_MS
     ret.wheelSpeeds.fr = pt_cp.vl["EBCMWheelSpdFront"]['FRWheelSpd'] * CV.KPH_TO_MS
     ret.wheelSpeeds.rl = pt_cp.vl["EBCMWheelSpdRear"]['RLWheelSpd'] * CV.KPH_TO_MS
@@ -39,11 +34,6 @@ class CarState(CarStateBase):
     # Brake pedal's potentiometer returns near-zero reading even when pedal is not pressed.
     if ret.brake < 10/0xd0:
       ret.brake = 0.
-
-    if not self.lka_button and self.lka_button != self.prev_lka_button:
-      self.stock_lka_enable = False
-    elif self.lka_button and self.lka_button != self.prev_lka_button:
-      self.stock_lka_enable = True
 
     ret.gas = pt_cp.vl["AcceleratorPedal"]['AcceleratorPedal'] / 254.
     ret.gasPressed = ret.gas > 1e-5
@@ -110,7 +100,6 @@ class CarState(CarStateBase):
       ("TractionControlOn", "ESPStatus", 0),
       ("EPBClosed", "EPBStatus", 0),
       ("CruiseMainOn", "ECMEngineStatus", 0),
-      ("LKAButton", "ASCMSteeringButton", 0),
     ]
 
     if CP.carFingerprint == CAR.VOLT or CP.carFingerprint == CAR.BOLT:

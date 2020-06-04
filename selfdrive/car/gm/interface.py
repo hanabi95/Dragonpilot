@@ -139,7 +139,7 @@ class CarInterface(CarInterfaceBase):
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
     ret.cruiseState.available = self.CS.main_on
-    ret.cruiseState.enabled = self.CS.main_on if not self.CS.stock_lka_enable else False
+    ret.cruiseState.enabled = self.CS.main_on if not self.CS.regen_pressed else False
 
     buttonEvents = []
 
@@ -170,9 +170,6 @@ class CarInterface(CarInterfaceBase):
     if not ret.cruiseState.available:
       events.append(create_event('wrongCarMode', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
-    if self.CS.regen_pressed:
-      events.append(create_event('manualSteeringRequired', [ET.WARNING]))
-
     if ret.cruiseState.enabled and not self.cruise_enable_prev:
       events.append(create_event('pcmEnable', [ET.ENABLE]))
     elif not ret.cruiseState.enabled:
@@ -186,9 +183,8 @@ class CarInterface(CarInterfaceBase):
 
     # handle button presses
     for b in ret.buttonEvents:
-      if not ret.cruiseState.enabled:
-        if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
-          events.append(create_event('buttonEnable', [ET.ENABLE]))
+      if b.type in [ButtonType.accelCruise, ButtonType.decelCruise] and not b.pressed:
+        events.append(create_event('buttonEnable', [ET.ENABLE]))
 
 
     ret.events = events
