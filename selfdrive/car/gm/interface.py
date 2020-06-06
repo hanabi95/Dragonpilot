@@ -179,7 +179,8 @@ class CarInterface(CarInterfaceBase):
     ret.steeringRateLimited = self.CC.steer_rate_limited if self.CC is not None else False
 
     ret.cruiseState.available = self.CS.main_on
-    ret.cruiseState.enabled = self.CS.main_on if not self.CS.regen_pressed else False
+    #ret.cruiseState.enabled = self.CS.main_on if not self.CS.regen_pressed else False
+    ret.cruiseState.enabled = self.CS.main_on
 
     buttonEvents = []
 
@@ -209,6 +210,9 @@ class CarInterface(CarInterfaceBase):
 
     if not ret.cruiseState.available:
       events.append(create_event('wrongCarMode', [ET.NO_ENTRY, ET.USER_DISABLE]))
+
+    if self.CS.regen_pressed:
+      events.append(create_event('manualSteeringRequired', [ET.WARNING]))  
 
     if ret.cruiseState.enabled and not self.cruise_enable_prev:
       events.append(create_event('pcmEnable', [ET.ENABLE]))
