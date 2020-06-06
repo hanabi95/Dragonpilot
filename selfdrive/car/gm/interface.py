@@ -99,7 +99,7 @@ class CarInterface(CarInterfaceBase):
       ret.steerRatioRear = 0.
       ret.centerToFront = ret.wheelbase * 0.4 # wild guess
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.,41.0], [0.,41.0]]
-      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.1,0.24], [0.011,0.02]]
+      ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.1,0.24], [0.01,0.019]]
       ret.lateralTuning.pid.kf = 0.000024
       tire_stiffness_factor = 1.0
       ret.steerRateCost = 1
@@ -212,7 +212,7 @@ class CarInterface(CarInterfaceBase):
       events.append(create_event('wrongCarMode', [ET.NO_ENTRY, ET.USER_DISABLE]))
 
     if self.CS.regen_pressed:
-      events.append(create_event('manualSteeringRequired', [ET.WARNING]))  
+      events.append(create_event('manualSteeringRequired', [ET.WARNING]))
 
     if ret.cruiseState.enabled and not self.cruise_enable_prev:
       events.append(create_event('pcmEnable', [ET.ENABLE]))
