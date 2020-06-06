@@ -4,7 +4,7 @@ from common.numpy_fast import interp
 from selfdrive.config import Conversions as CV
 from selfdrive.car import apply_std_steer_torque_limits
 from selfdrive.car.gm import gmcan
-from selfdrive.car.gm.values import DBC, CanBus
+from selfdrive.car.gm.values import DBC, CanBus, AccState
 from opendbc.can.packer import CANPacker
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
@@ -29,11 +29,11 @@ class CarControllerParams():
 
     # pedal lookups, only for Volt
     MAX_GAS = 3072              # Only a safety limit
-    ZERO_GAS = 2048
+    self.ZERO_GAS = 2048
     MAX_BRAKE = 350             # Should be around 3.5m/s^2, including regen
     self.MAX_ACC_REGEN = 1404  # ACC Regen braking is slightly less powerful than max regen paddle
     self.GAS_LOOKUP_BP = [-0.25, 0., 0.5]
-    self.GAS_LOOKUP_V = [self.MAX_ACC_REGEN, ZERO_GAS, MAX_GAS]
+    self.GAS_LOOKUP_V = [self.MAX_ACC_REGEN, self.ZERO_GAS, MAX_GAS]
     self.BRAKE_LOOKUP_BP = [-1., -0.25]
     self.BRAKE_LOOKUP_V = [MAX_BRAKE, 0]
 
@@ -129,12 +129,16 @@ class CarController():
     if (frame % 4) == 0:
       idx = (frame // 4) % 4
 
-      at_full_stop = enabled and CS.out.standstill
-      near_stop = enabled and (CS.out.vEgo < P.NEAR_STOP_BRAKE_PHASE)
+      #at_full_stop = enabled and CS.out.standstill
+      #near_stop = enabled and (CS.out.vEgo < P.NEAR_STOP_BRAKE_PHASE)
+      car_stopping = apply_gas < P.ZERO_GAS
+      standstill = CS.pcm_acc_status == AccState.STANDSTILL
+      at_full_stop = enabled and standstill and car_stopping
+      near_stop = enabled and (CS.out.vEgo < P.NEAR_STOP_BRAKE_PHASE) and car_stopping
       can_sends.append(gmcan.create_friction_brake_command(self.packer_ch, CanBus.CHASSIS, apply_brake, idx, near_stop, at_full_stop))
 
-      at_full_stop = enabled and CS.out.standstill
-      can_sends.append(gmcan.create_gas_regen_command(self.packer_pt, CanBus.POWERTRAIN, apply_gas, idx, enabled, at_full_stop))
+      #at_full_stop = enabled and CS.out.standstill
+      #can_sends.append(gmcan.create_gas_regen_command(self.packer_pt, CanBus.POWERTRAIN, apply_gas, idx, enabled, at_full_stop))
 
     # Send dashboard UI commands (ACC status), 25hz
     if (frame % 4) == 0:
