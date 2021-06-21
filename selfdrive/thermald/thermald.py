@@ -463,18 +463,6 @@ def thermald_thread():
       msg.deviceState.offroadPowerUsageUwh = power_monitor.get_power_used()
       msg.deviceState.carBatteryCapacityUwh = max(0, power_monitor.get_car_battery_capacity())
 
-    # dp - auto shutdown
-    # reset off_ts if we change auto shutdown related params
-    if off_ts is not None and dp_auto_shutdown_in_last != dp_auto_shutdown_in or dp_auto_shutdown_last != dp_auto_shutdown:
-      off_ts = sec_since_boot()
-    dp_auto_shutdown_last = dp_auto_shutdown
-    dp_auto_shutdown_in_last = dp_auto_shutdown_in
-
-    if dp_auto_shutdown and off_ts is not None:
-      shutdown_sec = dp_auto_shutdown_in * 60
-      if shutdown_sec < sec_since_boot() - off_ts <= MAX_TIME_OFFROAD_S:
-        off_ts = off_ts - MAX_TIME_OFFROAD_S
-
     # Check if we need to disable charging (handled by boardd)
     msg.deviceState.chargingDisabled = power_monitor.should_disable_charging(pandaState, off_ts)
 
@@ -493,6 +481,23 @@ def thermald_thread():
       # TODO: add function for blocking cloudlog instead of sleep
       time.sleep(10)
       HARDWARE.shutdown()
+
+    # dp - auto shutdown
+    # reset off_ts if we change auto shutdown related params
+    if off_ts is not None:
+      if dp_auto_shutdown:
+        shutdown_sec = dp_auto_shutdown_in * 60
+        sec_now = sec_since_boot() - off_ts
+        if (shutdown_sec - 5) < sec_now:
+          msg.deviceState.chargingDisabled = True
+        if shutdown_sec < sec_now:
+          time.sleep(10)
+          HARDWARE.shutdown()
+
+      if dp_auto_shutdown_in_last != dp_auto_shutdown_in or dp_auto_shutdown_last != dp_auto_shutdown:
+        off_ts = sec_since_boot()
+      dp_auto_shutdown_last = dp_auto_shutdown
+      dp_auto_shutdown_in_last = dp_auto_shutdown_in
 
     # If UI has crashed, set the brightness to reasonable non-zero value
     manager_state = messaging.recv_one_or_none(managerState_sock)
