@@ -1,5 +1,5 @@
 import os
-from common.params import Params
+from common.params import Params, put_nonblocking
 from common.basedir import BASEDIR
 from selfdrive.version import comma_remote, tested_branch
 from selfdrive.car.fingerprints import eliminate_incompatible_cars, all_legacy_fingerprint_cars
@@ -14,7 +14,7 @@ EventName = car.CarEvent.EventName
 
 
 def get_startup_event(car_recognized, controller_available, fuzzy_fingerprint, fw_seen):
-  if comma_remote and tested_branch:
+  if True:
     event = EventName.startup
   else:
     event = EventName.startupMaster
@@ -87,7 +87,8 @@ def only_toyota_left(candidate_cars):
 
 # **** for use live only ****
 def fingerprint(logcan, sendcan):
-  fixed_fingerprint = os.environ.get('FINGERPRINT', "")
+  dp_car_assigned = Params().get('dp_car_assigned', encoding='utf8')
+  fixed_fingerprint = os.environ.get('FINGERPRINT', "" if dp_car_assigned is None else dp_car_assigned)
   skip_fw_query = os.environ.get('SKIP_FW_QUERY', False)
 
   if not fixed_fingerprint and not skip_fw_query:
@@ -181,11 +182,15 @@ def get_car(logcan, sendcan):
     cloudlog.warning("car doesn't match any fingerprints: %r", fingerprints)
     candidate = "mock"
 
-  CarInterface, CarController, CarState = interfaces[candidate]
-  car_params = CarInterface.get_params(candidate, fingerprints, car_fw)
-  car_params.carVin = vin
-  car_params.carFw = car_fw
-  car_params.fingerprintSource = source
-  car_params.fuzzyFingerprint = not exact_match
+  try:
+    CarInterface, CarController, CarState = interfaces[candidate]
+    car_params = CarInterface.get_params(candidate, fingerprints, car_fw)
+    car_params.carVin = vin
+    car_params.carFw = car_fw
+    car_params.fingerprintSource = source
+    car_params.fuzzyFingerprint = not exact_match
 
-  return CarInterface(car_params, CarController, CarState), car_params
+    return CarInterface(car_params, CarController, CarState), car_params
+  except KeyError:
+    Params.put("dp_car_assigned", "")
+    return None, None
