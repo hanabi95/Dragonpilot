@@ -467,7 +467,7 @@ def thermald_thread():
     dp_auto_shutdown_last = dp_auto_shutdown
     dp_auto_shutdown_in_last = dp_auto_shutdown_in
 
-    if dp_auto_shutdown:
+    if dp_auto_shutdown and off_ts is not None:
       shutdown_sec = dp_auto_shutdown_in * 60
       if shutdown_sec < sec_since_boot() - off_ts <= MAX_TIME_OFFROAD_S:
         off_ts = off_ts - MAX_TIME_OFFROAD_S
