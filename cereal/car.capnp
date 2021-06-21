@@ -165,6 +165,7 @@ struct CarState {
   # brake pedal, 0.0-1.0
   brake @5 :Float32;      # this is user pedal only
   brakePressed @6 :Bool;  # this is user pedal only
+  regenPressed @39 :Bool; #this is regen button only
 
   # steering wheel
   steeringAngleDeg @7 :Float32;
@@ -178,9 +179,11 @@ struct CarState {
   stockAeb @30 :Bool;
   stockFcw @31 :Bool;
   espDisabled @32 :Bool;
+  lkasEnable @40 :Bool;
 
   # cruise state
   cruiseState @10 :CruiseState;
+  adaptiveCruise @41 :Bool;
 
   # gear
   gearShifter @14 :GearShifter;
@@ -463,8 +466,9 @@ struct CarParams {
     kpV @1 :List(Float32);
     kiBP @2 :List(Float32);
     kiV @3 :List(Float32);
-    deadzoneBP @4 :List(Float32);
-    deadzoneV @5 :List(Float32);
+    kf @4 :Float32;
+    deadzoneBP @5 :List(Float32);
+    deadzoneV @6 :List(Float32);
   }
 
   struct LateralINDITuning {

@@ -4,9 +4,9 @@ from selfdrive.controls.lib.pid import PIController
 
 LongCtrlState = log.ControlsState.LongControlState
 
-STOPPING_EGO_SPEED = 0.5
-STOPPING_TARGET_SPEED_OFFSET = 0.01
-STARTING_TARGET_SPEED = 0.5
+STOPPING_EGO_SPEED = 2.0
+STOPPING_TARGET_SPEED_OFFSET = 1.0
+STARTING_TARGET_SPEED = 1.0
 BRAKE_THRESHOLD_TO_PID = 0.2
 
 BRAKE_STOPPING_TARGET = 0.5  # apply at least this amount of brake to maintain the vehicle stationary
@@ -80,7 +80,7 @@ class LongControl():
 
     v_ego_pid = max(CS.vEgo, CP.minSpeedCan)  # Without this we get jumps, CAN bus reports 0 when speed < 0.3
 
-    if self.long_control_state == LongCtrlState.off or CS.gasPressed:
+    if self.long_control_state == LongCtrlState.off or CS.gasPressed or CS.regenPressed or not CS.adaptiveCruise:
       self.reset(v_ego_pid)
       output_gb = 0.
 
