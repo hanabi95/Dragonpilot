@@ -820,6 +820,14 @@ EVENTS: Dict[int, Dict[str, Union[Alert, Callable[[Any, messaging.SubMaster, boo
       Priority.LOW, VisualAlert.steerRequired, AudibleAlert.chimeWarning2, .1, .1, .1, alert_rate=0.75),
   },
 
+  EventName.manualSteeringRequired: {
+    ET.WARNING: Alert(
+      _("STEERING REQUIRED: Lane Keeping OFF"),
+      "",
+      AlertStatus.normal, AlertSize.small,
+      Priority.LOW, VisualAlert.none, AudibleAlert.none, .0, .1, .1, alert_rate=0.25),
+  },
+
   EventName.manualSteeringRequiredBlinkersOn: {
     ET.WARNING: Alert(
       _("STEERING REQUIRED: Blinkers ON"),
