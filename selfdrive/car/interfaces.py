@@ -63,8 +63,8 @@ class CarInterfaceBase():
 
     # standard ALC params
     ret.steerControlType = car.CarParams.SteerControlType.torque
-    ret.steerMaxBP = [0.]
-    ret.steerMaxV = [1.]
+    ret.steerMaxBP = [10., 25.]
+    ret.steerMaxV = [1., 1.2]
     ret.minSteerSpeed = 0.
 
     # stock ACC by default
@@ -77,9 +77,9 @@ class CarInterfaceBase():
     ret.brakeMaxV = [1.]
     ret.openpilotLongitudinalControl = False
     ret.startAccel = 0.0
-    ret.minSpeedCan = 0.3
+    ret.minSpeedCan = 0.5
     ret.stoppingBrakeRate = 0.2 # brake_travel/s while trying to stop
-    ret.startingBrakeRate = 0.8 # brake_travel/s while releasing on restart
+    ret.startingBrakeRate = 1.0 # brake_travel/s while releasing on restart
     ret.stoppingControl = False
     ret.longitudinalTuning.deadzoneBP = [0.]
     ret.longitudinalTuning.deadzoneV = [0.]
@@ -97,7 +97,7 @@ class CarInterfaceBase():
   def apply(self, c):
     raise NotImplementedError
 
-  def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1, pcm_enable=True):  # pylint: disable=dangerous-default-value
+  def create_common_events(self, cs_out, extra_gears=[], gas_resume_speed=-1):  # pylint: disable=dangerous-default-value
     events = Events()
 
     if cs_out.doorOpen:
@@ -120,8 +120,6 @@ class CarInterfaceBase():
       events.add(EventName.stockAeb)
     if cs_out.vEgo > MAX_CTRL_SPEED and self.dragonconf.dpSpeedCheck:
       events.add(EventName.speedTooHigh)
-    if cs_out.cruiseState.nonAdaptive and not self.dragonconf.dpAtl:
-      events.add(EventName.wrongCruiseMode)
 
     if (cs_out.leftBlinker or cs_out.rightBlinker) and self.dragonconf.dpLateralMode == 0:
       events.add(EventName.manualSteeringRequiredBlinkersOn)
@@ -146,12 +144,10 @@ class CarInterfaceBase():
               (cs_out.brakePressed and (not self.CS.out.brakePressed or not cs_out.standstill)):
         events.add(EventName.pedalPressed)
 
-    # we engage when pcm is active (rising edge)
-    if pcm_enable:
-      if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:
-        events.add(EventName.pcmEnable)
-      elif not cs_out.cruiseState.enabled:
-        events.add(EventName.pcmDisable)
+    if cs_out.cruiseState.enabled and not self.CS.out.cruiseState.enabled:
+      events.add(EventName.pcmEnable)
+    elif not cs_out.cruiseState.enabled:
+      events.add(EventName.pcmDisable)
 
     return events
 
