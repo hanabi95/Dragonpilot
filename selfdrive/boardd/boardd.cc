@@ -487,7 +487,7 @@ void pigeon_thread() {
   // from @florianbrede-ayet, disable gps for white panda
   #ifdef NoGPS
   return;
-  #else
+  #endif
   PubMaster pm({"ubloxRaw"});
   bool ignition_last = false;
 
@@ -558,7 +558,6 @@ void pigeon_thread() {
   }
 
   delete pigeon;
-  #endif
 }
 
 
