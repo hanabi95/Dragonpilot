@@ -35,9 +35,9 @@ _A_TOTAL_MAX_BP = [20., 40.]
 # dp
 DP_FOLLOWING_DIST = {
   0: 2.0,
-  1: 1.8,
-  2: 1.5,
-  3: 1.2,
+  1: 1.9,
+  2: 1.8,
+  3: 1.6,
 }
 
 DP_ACCEL_ECO = 0

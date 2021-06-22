@@ -10,6 +10,8 @@ from common.dp_common import common_controller_ctrl
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
+VEL = [13.889, 16.667, 22.2222]  # velocities
+MIN_PEDAL = [0., 0.05, 0.07]
 
 class CarController():
   def __init__(self, dbc_name, CP, VM):
