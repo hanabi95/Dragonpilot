@@ -193,7 +193,7 @@ class CarInterface(CarInterfaceBase):
     elif not self.cruise_enabled_prev:
       events.add(EventName.pcmEnable)
 
-    if dragonconf.dpTimebombAssist:
+    if dragonconf.dpVwTimebombAssist:
       ret.stopSteering = False
       if ret.cruiseState.enabled:
         self.timebomb_counter += 1

@@ -1,13 +1,16 @@
+dragonpilot 0.8.5-3
+========================
+* Added Jetson support toggle.
+* Added Steering Ratio controller.
+* Reduce Accel Profile to 3 modes only. (1.8s / 1.5s / 1.2s)
+* Bug fixes.
+
 dragonpilot 0.8.5-2
 ========================
 * Added black panda simulation toggle.
-* 加入黑熊貓模擬模式。
 * Added No GPS toggle.
-* 加入無 GPS 模式。
 * Added No Battery Toggle.
-* 加入無電池模式。
 * Bug fixes.
-* Bug 修復。
 
 dragonpilot 0.8.5-1
 ========================

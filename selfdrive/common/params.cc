@@ -278,6 +278,8 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"dp_disable_relay", PERSISTENT},
     {"dp_reg", PERSISTENT},
     {"dp_sr_learner", PERSISTENT},
+    {"dp_sr_custom", PERSISTENT},
+    {"dp_sr_stock", PERSISTENT},
     {"dp_lqr", PERSISTENT},
     {"dp_reset_live_param_on_start", PERSISTENT},
     {"dp_jetson", PERSISTENT},
@@ -287,6 +289,7 @@ std::unordered_map<std::string, uint32_t> keys = {
     {"dp_no_batt", PERSISTENT},
     {"dp_panda_fake_black", PERSISTENT},
     {"dp_panda_no_gps", PERSISTENT},
+    {"dp_last_candidate", PERSISTENT},
 };
 
 } // namespace
