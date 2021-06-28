@@ -227,6 +227,9 @@ def update_custom_logic(msg):
   if msg.dragonConf.dpLcMinMph > msg.dragonConf.dpLcAutoMinMph:
     put_nonblocking('dp_lc_auto_min_mph', str(msg.dragonConf.dpLcMinMph))
     msg.dragonConf.dpLcAutoMinMph = msg.dragonConf.dpLcMinMph
+  # if msg.dragonConf.dpSrCustom <= 4.99 and msg.dragonConf.dpSrStock > 0:
+  #   put_nonblocking('dp_sr_custom', str(msg.dragonConf.dpSrStock))
+  #   msg.dragonConf.dpSrCustom = msg.dragonConf.dpSrStock
   # if msg.dragonConf.dpAppWaze or msg.dragonConf.dpAppHr:
   #   msg.dragonConf.dpDrivingUi = False
   # if not msg.dragonConf.dpDriverMonitor:

@@ -59,5 +59,8 @@ struct DragonConf {
   dpCameraOffset @45 :Int8;
   dpPathOffset @46 :Int8;
   dpLocale @47 :Text;
-  dpDebug @48 :Bool;
+  dpSrLearner @48 :Bool;
+  dpSrCustom @49 :Float32;
+  dpSrStock @50 :Float32;
+  dpDebug @51 :Bool;
 }

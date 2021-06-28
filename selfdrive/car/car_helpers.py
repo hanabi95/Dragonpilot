@@ -185,6 +185,15 @@ def get_car(logcan, sendcan):
   try:
     CarInterface, CarController, CarState = interfaces[candidate]
     car_params = CarInterface.get_params(candidate, fingerprints, car_fw)
+    candidate_changed = Params().get('dp_last_candidate') != candidate
+    put_nonblocking("dp_sr_stock", str(car_params.steerRatio))
+    # update last candidate
+    if candidate_changed:
+      put_nonblocking('dp_last_candidate', candidate)
+    # update steering_ratio init val
+    dp_sr_custom = Params().get("dp_sr_custom", encoding='utf8')
+    if dp_sr_custom == '' or candidate_changed or (dp_sr_custom != '' and float(dp_sr_custom) <= 9.99):
+      put_nonblocking("dp_sr_custom", str(car_params.steerRatio))
     car_params.carVin = vin
     car_params.carFw = car_fw
     car_params.fingerprintSource = source
@@ -192,5 +201,7 @@ def get_car(logcan, sendcan):
 
     return CarInterface(car_params, CarController, CarState), car_params
   except KeyError:
-    Params.put("dp_car_assigned", "")
+    put_nonblocking("dp_car_assigned", '')
+    put_nonblocking("dp_sr_custom", '9.99')
+    put_nonblocking("dp_sr_stock", '9.99')
     return None, None

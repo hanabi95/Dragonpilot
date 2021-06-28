@@ -167,6 +167,8 @@ class Controls:
 
     # dp
     self.sm['dragonConf'].dpAtl = False
+    self.sm['dragonConf'].dpSrCustom = self.CP.steerRatio
+    self.sm['dragonConf'].dpSrLearner = True
 
   def update_events(self, CS):
     """Compute carEvents from carState"""
@@ -253,7 +255,7 @@ class Controls:
 
     if not self.sm['lateralPlan'].mpcSolutionValid:
       self.events.add(EventName.steerTempUnavailableUserOverride if self.sm['dragonConf'].dpAtl else EventName.plannerError)
-    if not self.sm['liveLocationKalman'].sensorsOK and not NOSENSOR:
+    if not self.dp_panda_no_gps and not self.sm['liveLocationKalman'].sensorsOK and not NOSENSOR:
       if self.sm.frame > 5 / DT_CTRL:  # Give locationd some time to receive all the inputs
         self.events.add(EventName.sensorDataInvalid)
     if not self.sm['liveLocationKalman'].posenetOK:
@@ -428,6 +430,11 @@ class Controls:
     params = self.sm['liveParameters']
     x = max(params.stiffnessFactor, 0.1)
     sr = max(params.steerRatio, 0.1)
+    if not self.sm['dragonConf'].dpSrLearner:
+      if self.sm['dragonConf'].dpSrCustom >= 10:
+        sr = self.sm['dragonConf'].dpSrCustom
+      else:
+        sr = self.CP.steerRatio
     self.VM.update_params(x, sr)
 
     lat_plan = self.sm['lateralPlan']

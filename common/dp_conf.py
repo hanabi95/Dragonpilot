@@ -47,9 +47,9 @@ confs = [
   # {'name': 'dp_lead_car_away_alert', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
 
   {'name': 'dp_following_profile_ctrl', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_atl', 'vals': [False]}], 'conf_type': ['param', 'struct']},
-  {'name': 'dp_following_profile', 'default': 0, 'type': 'UInt8', 'min': 0, 'max': 4, 'depends': [{'name': 'dp_atl', 'vals': [False]}, {'name': 'dp_following_profile_ctrl', 'vals': [True]}], 'conf_type': ['param', 'struct']},
+  {'name': 'dp_following_profile', 'default': 0, 'type': 'UInt8', 'min': 0, 'max': 2, 'depends': [{'name': 'dp_atl', 'vals': [False]}, {'name': 'dp_following_profile_ctrl', 'vals': [True]}], 'conf_type': ['param', 'struct']},
   {'name': 'dp_accel_profile_ctrl', 'default': False, 'type': 'Bool', 'depends': [{'name': 'dp_atl', 'vals': [False]}], 'conf_type': ['param', 'struct']},
-  {'name': 'dp_accel_profile', 'default': 0, 'type': 'UInt8', 'min': 0, 'max': 3, 'depends': [{'name': 'dp_atl', 'vals': [False]}, {'name': 'dp_accel_profile_ctrl', 'vals': [True]}], 'conf_type': ['param', 'struct']},
+  {'name': 'dp_accel_profile', 'default': 0, 'type': 'UInt8', 'min': 0, 'max': 2, 'depends': [{'name': 'dp_atl', 'vals': [False]}, {'name': 'dp_accel_profile_ctrl', 'vals': [True]}], 'conf_type': ['param', 'struct']},
   # safety
   {'name': 'dp_gear_check', 'default': True, 'type': 'Bool', 'depends': [{'name': 'dp_atl', 'vals': [False]}], 'conf_type': ['param', 'struct']},
   {'name': 'dp_speed_check', 'default': True, 'type': 'Bool', 'depends': [{'name': 'dp_atl', 'vals': [False]}], 'conf_type': ['param', 'struct']},
@@ -111,16 +111,19 @@ confs = [
   {'name': 'dp_disable_relay', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
   {'name': 'dp_reg', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
 
-  {'name': 'dp_sr_learner', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
+  {'name': 'dp_sr_learner', 'default': True, 'type': 'Bool', 'conf_type': ['param', 'struct']},
+  {'name': 'dp_sr_custom', 'default': 9.99, 'min': 9.99, 'max': 30, 'type': 'Float32', 'depends': [{'name': 'dp_sr_learner', 'vals': [False]}], 'conf_type': ['param', 'struct']},
+  {'name': 'dp_sr_stock', 'default': 9.99, 'min': 9.99, 'max': 100, 'type': 'Float32', 'conf_type': ['param', 'struct'], 'update_once': True},
   {'name': 'dp_lqr', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
   {'name': 'dp_reset_live_param_on_start', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
   {'name': 'dp_jetson', 'default': False, 'type': 'Bool', 'conf_type': ['param'], 'update_once': True},
   {'name': 'dp_debug', 'default': False, 'type': 'Bool', 'conf_type': ['param', 'struct']},
-  {'name': 'dp_car_assigned', 'default': '', 'type': 'Text', 'conf_type': ['param']},
-  {'name': 'dp_car_list', 'default': '', 'type': 'Text', 'conf_type': ['param']},
-  {'name': 'dp_no_batt', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
-  {'name': 'dp_panda_fake_black', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
-  {'name': 'dp_panda_no_gps', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
+  {'name': 'dp_car_assigned', 'default': '', 'type': 'Text', 'conf_type': ['param'], 'update_once': True},
+  {'name': 'dp_car_list', 'default': '', 'type': 'Text', 'conf_type': ['param'], 'update_once': True},
+  {'name': 'dp_no_batt', 'default': False, 'type': 'Bool', 'conf_type': ['param'], 'update_once': True},
+  {'name': 'dp_panda_fake_black', 'default': False, 'type': 'Bool', 'conf_type': ['param'], 'update_once': True},
+  {'name': 'dp_panda_no_gps', 'default': False, 'type': 'Bool', 'conf_type': ['param'], 'update_once': True},
+  {'name': 'dp_last_candidate', 'default': '', 'type': 'Text', 'conf_type': ['param'], 'update_once': True},
 ]
 
 def get_definition(name):
