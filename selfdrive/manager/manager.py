@@ -12,7 +12,7 @@ from common.basedir import BASEDIR
 from common.params import Params, ParamKeyType
 from common.text_window import TextWindow
 from selfdrive.boardd.set_time import set_time
-from selfdrive.hardware import HARDWARE, PC, TICI
+from selfdrive.hardware import HARDWARE, PC, TICI, EON
 from selfdrive.manager.helpers import unblock_stdout
 from selfdrive.manager.process import ensure_running
 from selfdrive.manager.process_config import managed_processes
@@ -21,6 +21,8 @@ from selfdrive.swaglog import cloudlog, add_file_handler
 from selfdrive.version import dirty, get_git_commit, version, origin, branch, commit, \
                               terms_version, training_version, comma_remote, \
                               get_git_branch, get_git_remote
+from common.dp_conf import init_params_vals
+
 
 def manager_init():
 
@@ -48,6 +50,10 @@ def manager_init():
     if params.get(k) is None:
       params.put(k, v)
 
+  # dp init params
+  init_params_vals(params)
+  dp_reg = params.get_bool('dp_reg')
+
   # is this dashcam?
   if os.getenv("PASSIVE") is not None:
     params.put_bool("Passive", bool(int(os.getenv("PASSIVE"))))
@@ -65,6 +71,13 @@ def manager_init():
   except PermissionError:
     print("WARNING: failed to make /dev/shm")
 
+  # dp - make sure libmessaging_shared.so is working
+  if EON:
+    os.chmod(BASEDIR, 0o755)
+    os.chmod("/dev/shm", 0o777)
+    os.chmod(os.path.join(BASEDIR, "cereal"), 0o755)
+    os.chmod(os.path.join(BASEDIR, "cereal", "libmessaging_shared.so"), 0o755)
+
   # set version params
   params.put("Version", version)
   params.put("TermsVersion", terms_version)
@@ -74,7 +87,7 @@ def manager_init():
   params.put("GitRemote", get_git_remote(default=""))
 
   # set dongle id
-  reg_res = register(show_spinner=True)
+  reg_res = register(show_spinner=True) if dp_reg else UNREGISTERED_DONGLE_ID
   if reg_res:
     dongle_id = reg_res
   else:
@@ -111,12 +124,37 @@ def manager_thread():
   cloudlog.info("manager start")
   cloudlog.info({"environ": os.environ})
 
-  # save boot log
-  subprocess.call("./bootlog", cwd=os.path.join(BASEDIR, "selfdrive/loggerd"))
-
   params = Params()
 
+  dp_reg = params.get_bool('dp_reg')
+  dp_appd = params.get_bool('dp_appd')
+  dp_updated = params.get_bool('dp_updated')
+  dp_logger = params.get_bool('dp_logger')
+  dp_athenad = params.get_bool('dp_athenad')
+  dp_uploader = params.get_bool('dp_uploader')
+  dp_dashcamd = params.get_bool('dp_dashcamd')
+  dp_panda_no_gps = params.get_bool('dp_panda_no_gps')
+  # save boot log
+  if dp_logger:
+    subprocess.call("./bootlog", cwd=os.path.join(BASEDIR, "selfdrive/loggerd"))
+
   ignore = []
+  if not dp_appd:
+    ignore += ['appd']
+  if dp_panda_no_gps:
+    ignore += ['ubloxd']
+  if not dp_dashcamd:
+    ignore += ['dashcamd']
+  if not dp_updated:
+    ignore += ['updated']
+  if not dp_logger:
+    ignore += ['logcatd', 'loggerd', 'proclogd', 'logmessaged', 'tombstoned']
+  if not dp_athenad:
+    ignore += ['manage_athenad']
+  if not dp_uploader or not dp_reg:
+    ignore += ['uploader']
+  if not dp_athenad and not dp_uploader:
+    ignore += ['deleter']
   if params.get("DongleId", encoding='utf8') == UNREGISTERED_DONGLE_ID:
     ignore += ["manage_athenad", "uploader"]
   if os.getenv("NOBOARD") is not None:
