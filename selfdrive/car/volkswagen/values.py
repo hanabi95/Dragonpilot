@@ -26,6 +26,7 @@ class CANBUS:
   pt = 0
   cam = 2
 
+NetworkLocation = car.CarParams.NetworkLocation
 TransmissionType = car.CarParams.TransmissionType
 GearShifter = car.CarState.GearShifter
 
