@@ -12,7 +12,7 @@ from common.basedir import BASEDIR
 from common.params import Params, ParamKeyType
 from common.text_window import TextWindow
 from selfdrive.boardd.set_time import set_time
-from selfdrive.hardware import HARDWARE, PC, TICI
+from selfdrive.hardware import HARDWARE, PC, TICI, EON
 from selfdrive.manager.helpers import unblock_stdout
 from selfdrive.manager.process import ensure_running
 from selfdrive.manager.process_config import managed_processes
@@ -71,6 +71,13 @@ def manager_init():
   except PermissionError:
     print("WARNING: failed to make /dev/shm")
 
+  # dp - make sure libmessaging_shared.so is working
+  if EON:
+    os.chmod(BASEDIR, 0o755)
+    os.chmod("/dev/shm", 0o777)
+    os.chmod(os.path.join(BASEDIR, "cereal"), 0o755)
+    os.chmod(os.path.join(BASEDIR, "cereal", "libmessaging_shared.so"), 0o755)
+
   # set version params
   params.put("Version", version)
   params.put("TermsVersion", terms_version)
@@ -120,6 +127,7 @@ def manager_thread():
   params = Params()
 
   dp_reg = params.get_bool('dp_reg')
+  dp_appd = params.get_bool('dp_appd')
   dp_updated = params.get_bool('dp_updated')
   dp_logger = params.get_bool('dp_logger')
   dp_athenad = params.get_bool('dp_athenad')
@@ -131,6 +139,8 @@ def manager_thread():
     subprocess.call("./bootlog", cwd=os.path.join(BASEDIR, "selfdrive/loggerd"))
 
   ignore = []
+  if not dp_appd:
+    ignore += ['appd']
   if dp_panda_no_gps:
     ignore += ['ubloxd']
   if not dp_dashcamd:

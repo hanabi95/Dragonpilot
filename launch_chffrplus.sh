@@ -237,6 +237,9 @@ function launch {
   ln -sfn $(pwd) /data/pythonpath
   export PYTHONPATH="$PWD"
 
+  # dp - ignore chmod changes
+  git -C $DIR config core.fileMode false
+
   # hardware specific init
   if [ -f /EON ]; then
     two_init

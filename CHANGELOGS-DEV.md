@@ -1,8 +1,15 @@
+dragonpilot 0.8.5-4
+========================
+* Added multiple toggles.
+* Code clean up.
+* Android app support. (see selfdrive/dragonpilot/HOWTO-APPD.md)
+* Better support for VW MPQ (Thanks to @Saber)
+
 dragonpilot 0.8.5-3
 ========================
 * Added Jetson support toggle.
 * Added Steering Ratio controller.
-* Reduce Accel Profile to 3 modes only. (1.8s / 1.5s / 1.2s)
+* Reduce Following Profile to 3 modes only. (1.8s / 1.5s / 1.2s)
 * Bug fixes.
 
 dragonpilot 0.8.5-2

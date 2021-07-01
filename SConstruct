@@ -352,7 +352,8 @@ if GetOption("clazy"):
   qt_env['ENV']['CLAZY_IGNORE_DIRS'] = qt_dirs[0]
   qt_env['ENV']['CLAZY_CHECKS'] = ','.join(checks)
 
-Export('env', 'qt_env', 'arch', 'real_arch', 'SHARED', 'USE_WEBCAM', 'USE_MIPI')
+zmq = 'zmq'
+Export('env', 'qt_env', 'arch', 'real_arch', 'SHARED', 'USE_WEBCAM', 'zmq', 'USE_MIPI')
 
 # cereal and messaging are shared with the system
 SConscript(['cereal/SConscript'])

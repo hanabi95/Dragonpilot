@@ -1,7 +1,7 @@
 Import('env', 'envCython', 'common', 'cereal', 'messaging')
-# dp - Add read dp_disable_relay value
-if FindFile('dp_disable_relay', '/data/params/d') != None:
-  with open('/data/params/d/dp_disable_relay') as f:
+# dp - Add read dp_toyota_disable_relay value
+if FindFile('dp_toyota_disable_relay', '/data/params/d') != None:
+  with open('/data/params/d/dp_toyota_disable_relay') as f:
     if (int(f.read().strip())) == 1:
       env.Append(CCFLAGS='-DDisableRelay')
 

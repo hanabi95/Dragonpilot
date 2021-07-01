@@ -216,10 +216,13 @@ class CarInterface(CarInterfaceBase):
       ret.lateralTuning.pid.kiBP, ret.lateralTuning.pid.kpBP = [[0.], [0.]]
       ret.lateralTuning.pid.kpV, ret.lateralTuning.pid.kiV = [[0.16], [0.01]]
       ret.lateralTuning.init('indi')
-      ret.lateralTuning.indi.innerLoopGain = 3.5
-      ret.lateralTuning.indi.outerLoopGain = 2.0
-      ret.lateralTuning.indi.timeConstant = 1.4
-      ret.lateralTuning.indi.actuatorEffectiveness = 2.3
+      ret.lateralTuning.indi.innerLoopGainV = [3.5]
+      ret.lateralTuning.indi.innerLoopGainBP = [0.]
+      ret.lateralTuning.indi.outerLoopGainV = [2.0]
+      ret.lateralTuning.indi.outerLoopGainBP = [0.]
+      ret.lateralTuning.indi.timeConstantV = [1.4]
+      ret.lateralTuning.indi.actuatorEffectivenessV = [2.3]
+      ret.lateralTuning.indi.actuatorEffectivenessBP = [0.]
       ret.minSteerSpeed = 60 * CV.KPH_TO_MS
     elif candidate == CAR.GENESIS_G90:
       ret.mass = 2200
