@@ -17,7 +17,7 @@ from common.i18n import get_locale
 from common.dp_common import param_get, get_last_modified
 from common.dp_time import LAST_MODIFIED_SYSTEMD
 from selfdrive.dragonpilot.dashcamd import Dashcamd
-from selfdrive.dragonpilot.appd import Appd
+#from selfdrive.dragonpilot.appd import Appd
 from selfdrive.hardware import EON
 
 PARAM_PATH = params.get_params_path() + '/d/'
@@ -44,7 +44,7 @@ def confd_thread():
   last_charging_ctrl = False
   last_started = False
   dashcamd = Dashcamd()
-  appd = Appd()
+  #appd = Appd()
   dashcam_recorded = False
   last_dashcam_recorded = False
 
@@ -163,8 +163,8 @@ def confd_thread():
     appd
     ===================================================
     '''
-    if msg.dragonConf.dpAppd:
-      appd.run(started)
+    #if msg.dragonConf.dpAppd:
+    #  appd.run(started)
     '''
     ===================================================
     finalise
