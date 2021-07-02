@@ -47,7 +47,7 @@ class Controls:
   def __init__(self, sm=None, pm=None, can_sock=None):
     params = Params()
     self.dp_jetson = params.get_bool('dp_jetson')
-    self.dp_panda_no_gps = self.dp_jetson or params.get_bool('dp_panda_no_gps')
+    self.dp_panda_no_gps = params.get_bool('dp_panda_no_gps')
     config_realtime_process(4 if TICI else 3, Priority.CTRL_HIGH)
 
     # Setup sockets
@@ -62,7 +62,9 @@ class Controls:
 
     self.sm = sm
     if self.sm is None:
-      ignore = ['driverCameraState', 'managerState'] if (self.dp_jetson or SIMULATION) else None
+      ignore = ['driverCameraState', 'managerState'] if SIMULATION else None
+      if self.dp_jetson:
+        ignore = ['driverCameraState'] if ignore is None else ignore + ['driverCameraState']
       if self.dp_panda_no_gps:
         ignore = ['liveLocationKalman'] if ignore is None else ignore + ['liveLocationKalman']
       self.sm = messaging.SubMaster(['deviceState', 'pandaState', 'modelV2', 'liveCalibration',
@@ -203,12 +205,12 @@ class Controls:
       self.events.add(EventName.lowMemory)
 
     # Alert if fan isn't spinning for 5 seconds
-    # if self.sm['pandaState'].pandaType in [PandaType.uno, PandaType.dos]:
-    #   if self.sm['pandaState'].fanSpeedRpm == 0 and self.sm['deviceState'].fanSpeedPercentDesired > 50:
-    #     if (self.sm.frame - self.last_functional_fan_frame) * DT_CTRL > 5.0:
-    #       self.events.add(EventName.fanMalfunction)
-    #   else:
-    #     self.last_functional_fan_frame = self.sm.frame
+    if self.sm['pandaState'].pandaType in [PandaType.uno, PandaType.dos]:
+      if self.sm['pandaState'].fanSpeedRpm == 0 and self.sm['deviceState'].fanSpeedPercentDesired > 50:
+        if (self.sm.frame - self.last_functional_fan_frame) * DT_CTRL > 5.0:
+          self.events.add(EventName.fanMalfunction)
+      else:
+        self.last_functional_fan_frame = self.sm.frame
 
     # Handle calibration status
     cal_status = self.sm['liveCalibration'].calStatus
@@ -290,17 +292,17 @@ class Controls:
             self.events.add(evt)
 
     # TODO: fix simulator
-    if not self.dp_panda_no_gps and not SIMULATION:
-      if not NOSENSOR:
+    if not SIMULATION:
+      if not self.dp_panda_no_gps and not NOSENSOR:
         if not self.sm['liveLocationKalman'].gpsOK and (self.distance_traveled > 1000) and \
           (not TICI or self.enable_lte_onroad):
           # Not show in first 1 km to allow for driving out of garage. This event shows after 5 minutes
           self.events.add(EventName.noGps)
-      if not self.sm.all_alive(self.camera_packets):
+      if not self.dp_jetson and not self.sm.all_alive(self.camera_packets):
         self.events.add(EventName.cameraMalfunction)
       if self.sm['modelV2'].frameDropPerc > 20:
         self.events.add(EventName.modeldLagging)
-      if self.sm['liveLocationKalman'].excessiveResets:
+      if not self.dp_panda_no_gps and self.sm['liveLocationKalman'].excessiveResets:
         self.events.add(EventName.localizerMalfunction)
 
       # Check if all manager processes are running
