@@ -79,7 +79,7 @@ confs = [
   {'name': 'dp_path_offset', 'default': 0, 'type': 'Int8', 'min': -100, 'max': 100, 'conf_type': ['param', 'struct']},
 
   {'name': 'dp_locale', 'default': 'en-US', 'type': 'Text', 'conf_type': ['param', 'struct'], 'update_once': True},
-  {'name': 'dp_reg', 'default': False, 'type': 'Bool', 'conf_type': ['param']},
+  {'name': 'dp_reg', 'default': True, 'type': 'Bool', 'conf_type': ['param']},
   # sr learner related
   {'name': 'dp_sr_learner', 'default': True, 'type': 'Bool', 'conf_type': ['param', 'struct']},
   {'name': 'dp_sr_custom', 'default': 9.99, 'min': 9.99, 'max': 30., 'type': 'Float32', 'depends': [{'name': 'dp_sr_learner', 'vals': [False]}], 'conf_type': ['param', 'struct']},

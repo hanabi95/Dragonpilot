@@ -87,7 +87,7 @@ def manager_init():
   params.put("GitRemote", get_git_remote(default=""))
 
   # set dongle id
-  reg_res = register(show_spinner=True) if dp_reg else UNREGISTERED_DONGLE_ID
+  reg_res = register(show_spinner=True)
   if reg_res:
     dongle_id = reg_res
   else:
@@ -134,6 +134,12 @@ def manager_thread():
   dp_uploader = params.get_bool('dp_uploader')
   dp_dashcamd = params.get_bool('dp_dashcamd')
   dp_panda_no_gps = params.get_bool('dp_panda_no_gps')
+  if params.get_bool('dp_atl'):
+    dp_reg = False
+  if not dp_reg:
+    dp_logger = False
+    dp_athenad = False
+    dp_uploader = False
   # save boot log
   if dp_logger:
     subprocess.call("./bootlog", cwd=os.path.join(BASEDIR, "selfdrive/loggerd"))

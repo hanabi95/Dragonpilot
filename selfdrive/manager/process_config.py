@@ -4,7 +4,7 @@ from selfdrive.manager.process import PythonProcess, NativeProcess, DaemonProces
 from selfdrive.hardware import EON, TICI, PC, JETSON
 from common.params import Params
 
-JETSON = JETSON or Params().get_bool("dp_jetson")
+JETSON = JETSON or Params().get_bool('dp_jetson')
 WEBCAM = os.getenv("USE_WEBCAM") is not None
 
 procs = [
@@ -17,8 +17,8 @@ procs = [
   NativeProcess("loggerd", "selfdrive/loggerd", ["./loggerd"], enabled=not JETSON),
   NativeProcess("modeld", "selfdrive/modeld", ["./modeld"]),
   NativeProcess("proclogd", "selfdrive/proclogd", ["./proclogd"], enabled=not JETSON),
-  NativeProcess("sensord", "selfdrive/sensord", ["./sensord"], enabled=not PC and not JETSON, persistent=EON, sigkill=EON),
-  NativeProcess("ubloxd", "selfdrive/locationd", ["./ubloxd"], enabled=not JETSON and (not PC or WEBCAM)),
+  NativeProcess("sensord", "selfdrive/sensord", ["./sensord"], enabled=not PC, persistent=EON, sigkill=EON),
+  NativeProcess("ubloxd", "selfdrive/locationd", ["./ubloxd"], enabled=not PC or WEBCAM),
   NativeProcess("ui", "selfdrive/ui", ["./ui"], persistent=True, watchdog_max_dt=(10 if TICI else None)),
   NativeProcess("locationd", "selfdrive/locationd", ["./locationd"]),
   PythonProcess("calibrationd", "selfdrive.locationd.calibrationd"),
