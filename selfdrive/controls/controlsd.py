@@ -262,9 +262,9 @@ class Controls:
     if not self.dp_panda_no_gps and not self.sm['liveLocationKalman'].sensorsOK and not NOSENSOR:
       if self.sm.frame > 5 / DT_CTRL:  # Give locationd some time to receive all the inputs
         self.events.add(EventName.sensorDataInvalid)
-    if not self.sm['liveLocationKalman'].posenetOK:
+    if not self.dp_panda_no_gps and not self.sm['liveLocationKalman'].posenetOK:
       self.events.add(EventName.posenetInvalid)
-    if not self.sm['liveLocationKalman'].deviceStable:
+    if not self.dp_panda_no_gps and not self.sm['liveLocationKalman'].deviceStable:
       self.events.add(EventName.deviceFalling)
     if log.PandaState.FaultType.relayMalfunction in self.sm['pandaState'].faults:
       self.events.add(EventName.relayMalfunction)
@@ -306,9 +306,9 @@ class Controls:
         self.events.add(EventName.localizerMalfunction)
 
       # Check if all manager processes are running
-      not_running = set(p.name for p in self.sm['managerState'].processes if not p.running)
-      if self.sm.rcv_frame['managerState'] and (not_running - IGNORE_PROCESSES):
-        self.events.add(EventName.processNotRunning)
+      # not_running = set(p.name for p in self.sm['managerState'].processes if not p.running)
+      # if self.sm.rcv_frame['managerState'] and (not_running - IGNORE_PROCESSES):
+      #   self.events.add(EventName.processNotRunning)
 
     # Only allow engagement with brake pressed when stopped behind another stopped car
     if not self.sm['dragonConf'].dpAtl and CS.brakePressed and self.sm['longitudinalPlan'].vTargetFuture >= STARTING_TARGET_SPEED \
