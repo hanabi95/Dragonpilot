@@ -10,8 +10,16 @@ from common.dp_common import common_controller_ctrl
 
 VisualAlert = car.CarControl.HUDControl.VisualAlert
 
-VEL = [13.889, 16.667, 22.2222]  # velocities
-MIN_PEDAL = [0., 0.06, 0.1]
+def accel_hysteresis(accel, accel_steady):
+
+  # for small accel oscillations less than 0.02, don't change the accel command
+  if accel > accel_steady + 0.02:
+    accel_steady = accel - 0.02
+  elif accel < accel_steady - 0.02:
+    accel_steady = accel + 0.02
+  accel = accel_steady
+
+  return accel, accel_steady
 
 class CarController():
   def __init__(self, dbc_name, CP, VM):
@@ -23,7 +31,6 @@ class CarController():
     self.apply_steer_last = 0
     self.lka_icon_status_last = (False, False)
     self.steer_rate_limited = False
-    self.apply_pedal_last = 0.
 
     self.params = CarControllerParams()
 
@@ -67,14 +74,12 @@ class CarController():
     # Pedal/Regen
     if CS.CP.enableGasInterceptor and (frame % 2) == 0:
 
-      if not enabled or not CS.adaptive_Cruise:
+      if not enabled or not CS.adaptive_Cruise or CS.out.vEgo <= 16.6:
         final_pedal = 0
-      elif CS.adaptive_Cruise:
-        min_pedal_speed = interp(CS.out.vEgo, VEL, MIN_PEDAL)
-        regen = clip(actuators.brake / 2, 0., 0.1)
-        pedal = 0.6 * actuators.gas + self.apply_pedal_last * 0.4
-        gas_pedal = clip(pedal, min_pedal_speed, 1.)
-        final_pedal = clip(gas_pedal - regen, 0., 1.)
+      elif CS.adaptive_Cruise and CS.out.vEgo > 16.6:
+        accel = actuators.gas - actuators.brake
+        accel, self.accel_steady = accel_hysteresis(accel, self.accel_steady)
+        final_pedal = clip(accel, 0., 1.)
 
       self.apply_pedal_last = final_pedal
       idx = (frame // 2) % 4
