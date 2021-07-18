@@ -31,6 +31,7 @@ class CarController():
     self.apply_steer_last = 0
     self.lka_icon_status_last = (False, False)
     self.steer_rate_limited = False
+    self.accel_steady = 0
 
     self.params = CarControllerParams()
 
@@ -81,7 +82,6 @@ class CarController():
         accel, self.accel_steady = accel_hysteresis(accel, self.accel_steady)
         final_pedal = clip(accel, 0., 1.)
 
-      self.apply_pedal_last = final_pedal
       idx = (frame // 2) % 4
       can_sends.append(create_gas_command(self.packer_pt, final_pedal, idx))
 
